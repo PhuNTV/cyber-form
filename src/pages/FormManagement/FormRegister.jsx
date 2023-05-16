@@ -1,106 +1,50 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import Modal from './Modal';
 class FormRegister extends Component {
-    state = {
-        value: {
-            id: '',
-            studentName: '',
-            phone: '',
-            email: '',
-        },
-        error: {
-            id: '',
-            studentName: '',
-            phone: '',
-            email: '',
-        },
-        modal: {
-            isOpen: false,
-            message: '',
-        }
-    };
-    handleOnchange = (event) => {
-        const { id, name, value } = event.target;
-        // console.log({ id, name, className, value });
-        const newValue = { ...this.state.value };
-
-        newValue[id] = value;
-
-        const newError = { ...this.state.error };
-
-        let messError = '';
-        if (value === '') {
-            messError = name + ' không được bỏ trống'
-        }
-
-        if (id === 'email') {
-            const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i;
-
-            if (regexEmail.test(value) === false) {
-
-                messError = 'Email Không Hợp Lệ.';
-            }
-        }
-
-        newError[id] = messError;
-        this.setState(
-            {
-                value: newValue,
-                error: newError,
-            },
-            () => {
-                // console.log(this.state)
-            });
-    }
-    handleSubmit = (event) => {
-        event.preventDefault();
-        for (let keyValue in this.state.value) {
-            if (this.state.value[keyValue] === '') {
-                this.setState({
-                    modal: {
-                        isOpen: true,
-                        message: 'Bạn nhập chưa đủ dữ liệu',
-                    },
-                });
-                return;
-            }
-        };
-        for (let keyError in this.state.error) {
-            if (this.state.error[keyError] !== '') {
-                this.setState({
-                    modal: {
-                        isOpen: true,
-                        message: this.state.error[keyError],
-                    },
-                });
-                return;
-            }
-        }
-        console.log('[SUBMIT]', this.state.value)
-
+    getInfo = (e) => {
+        let { id, value } = e.target;
+        let dataType = e.target.getAttribute("data-type");
         const action = {
-            type: 'ADD_STUDENT',
-            payload: this.state.value,
-        };
-
-        this.props.dispatch(action);
-    }
-
-    hanleCloseModal = () => {
-        this.setState({
-            modal: {
-                isOpen: false,
-                message: '',
+            type: "HANDLE_INPUT",
+            payload: {
+                id: id,
+                value: value,
+                dataType: dataType,
             },
-        });
-    }
+        };
+        this.props.dispatch(action);
+    };
 
+
+    createStudent = (e) => {
+        e.preventDefault();
+        const action = {
+            type: "HANDLE_CREATE",
+        };
+        this.props.dispatch(action);
+    };
+    updateSubmit = (e) => {
+        e.preventDefault();
+        let { id, value, student } = this.props;
+        let dataType = e.target.getAttribute("data-type");
+        const action = {
+            type: "HANDLE_UPDATE_SUBMIT",
+            payload: {
+                id: id,
+                value: value,
+                dataType: dataType,
+                student: student,
+                studentId: student.studentId,
+            },
+        };
+        this.props.dispatch(action);
+    };
 
     render() {
-        const { id, studentName, phone, email } = this.props.studentEdit;
+        let { err, student } = this.props;
+        const { showAddStudentButton } = this.props;
         return (
-            <form onSubmit={this.handleSubmit}>
+            <form onSubmit={this.createStudent}>
                 <div className='card '>
                     <h2 className='card-header text-white bg-dark'>Thông Tin Sinh Viên</h2>
                     <div className="row">
@@ -112,12 +56,14 @@ class FormRegister extends Component {
                                 <input type="text"
                                     className='form-control'
                                     placeholder='Nhập Mã Sinh Viên'
-                                    id='id'
-                                    name='Mã sinh viên'
-                                    onChange={this.handleOnchange}
-                                    value={id}
+                                    id='studentId'
+                                    data-type='studentId'
+                                    onChange={this.getInfo}
+                                    value={student.studentId}
                                 />
-                                <p className='text-danger'>{this.state.error.id}</p>
+                                <span className="text-danger" style={{ fontSize: 14 }}>
+                                    {err.studentId}
+                                </span>
                             </div>
                             <div className='mt-3'>
                                 <label className='form-label'>Số Điện Thoại</label>
@@ -125,11 +71,13 @@ class FormRegister extends Component {
                                     className='form-control'
                                     placeholder='Nhập Số Điện Thoại'
                                     id='phone'
-                                    name='Số điện thoại'
-                                    onChange={this.handleOnchange}
-                                    value={phone}
+                                    data-type='phone'
+                                    onChange={this.getInfo}
+                                    value={student.phone}
                                 />
-                                <p className='text-danger'>{this.state.error.phone}</p>
+                                <span className="text-danger" style={{ fontSize: 14 }}>
+                                    {err.phone}
+                                </span>
                             </div>
 
                         </div>
@@ -143,11 +91,13 @@ class FormRegister extends Component {
                                     className='form-control'
                                     placeholder='Nhập Họ Tên'
                                     id='studentName'
-                                    name='Họ tên'
-                                    onChange={this.handleOnchange}
-                                    value={studentName}
+                                    data-type='studentName'
+                                    onChange={this.getInfo}
+                                    value={student.studentName}
                                 />
-                                <p className='text-danger'>{this.state.error.studentName}</p>
+                                <span className="text-danger" style={{ fontSize: 14 }}>
+                                    {err.studentName}
+                                </span>
                             </div>
                             <div className='mt-3'>
                                 <label className='form-label'>Email</label>
@@ -155,11 +105,13 @@ class FormRegister extends Component {
                                     className='form-control'
                                     placeholder='Nhập Email'
                                     id='email'
-                                    name='Email'
-                                    onChange={this.handleOnchange}
-                                    value={email}
+                                    data-type='email'
+                                    onChange={this.getInfo}
+                                    value={student.email}
                                 />
-                                <p className='text-danger'>{this.state.error.email}</p>
+                                <span className="text-danger" style={{ fontSize: 14 }}>
+                                    {err.email}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -168,14 +120,16 @@ class FormRegister extends Component {
                         <div className="col-2" style={{
                             padding: '0 2rem 1rem '
                         }}>
-                            <button className='btn btn-success'>Thêm Sinh Viên</button>
+                            {showAddStudentButton && <button
+                                onClick={this.createStudent}
+                                className='btn btn-success'>Thêm Sinh Viên</button>}
+                            {!showAddStudentButton && <button
+                                className='btn btn-success'
+                                onClick={this.updateSubmit}
+                            >Cập Nhập</button>}
                         </div>
                     </div>
                 </div>
-                {this.state.modal.isOpen && <Modal
-                    hanleCloseModal={this.hanleCloseModal}
-                    message={this.state.modal.message} />}
-
             </form>
         );
     }
@@ -183,7 +137,8 @@ class FormRegister extends Component {
 
 const mapStateToProps = (rootReducer) => {
     return {
-        studentEdit: rootReducer.formReducer.studentEdit,
+        err: rootReducer.formReducer.validErr,
+        student: rootReducer.formReducer.student,
     }
 }
 

@@ -3,7 +3,7 @@ import { formReducer } from './reducers/formReducer'
 
 const rootReducer = combineReducers({
 
-    formReducer,
+    formReducer: formReducer,
 
 });
 

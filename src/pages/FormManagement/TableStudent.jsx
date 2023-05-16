@@ -1,14 +1,113 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 class TableStudent extends Component {
-    handleEditStudent = (student) => {
-        this.props.dispatch({
-            type: 'EDIT_STUDENT',
-            payload: student,
-        });
-    }
+
+
+    renderStudentInfo = () => {
+        let { studentInfo, searchList, searchInp } = this.props;
+        if (!searchList.length) {
+            if (searchInp !== "") {
+                return (
+                    <tr className="text-center">
+                        <td colSpan={5}>Không có kết quả phù hợp!</td>
+                    </tr>
+                );
+            }
+            console.log("dssv", studentInfo);
+            return studentInfo.map((student, index) => {
+                return (
+                    <tr key={index}>
+                        <td>{student.studentId}</td>
+                        <td>{student.studentName}</td>
+                        <td>{student.phone}</td>
+                        <td>{student.email}</td>
+                        <td>
+                            <button
+                                className="btn btn-danger mx-2"
+                                onClick={() => {
+                                    const action = {
+                                        type: "HANDLE_DELETE",
+                                        payload: {
+                                            student: student,
+                                            studentId: student.studentId,
+                                        },
+                                    };
+                                    this.props.dispatch(action);
+                                }}
+                            >
+                                Xóa
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    this.props.onEdit();
+                                    document.getElementById("studentId").disabled = true;
+
+                                    const action = {
+                                        type: "HANDLE_UPDATE_RENDER",
+                                        payload: {
+                                            student: student,
+                                            studentId: student.studentId,
+                                        },
+                                    };
+                                    this.props.dispatch(action);
+                                }}
+                            >
+                                Sửa
+                            </button>
+                        </td>
+                    </tr>
+                );
+            });
+        } else {
+            console.log("searchlist", searchList);
+            return searchList.map((student, index) => {
+                return (
+                    <tr key={index}>
+                        <td>{student.studentId}</td>
+                        <td>{student.studentId}</td>
+                        <td>{student.phone}</td>
+                        <td>{student.email}</td>
+                        <td>
+                            <button
+                                className="btn btn-danger mx-2"
+                                onClick={() => {
+                                    const action = {
+                                        type: "HANDLE_DELETE",
+                                        payload: {
+                                            student: student,
+                                            studentId: student.studentId,
+                                        },
+                                    };
+                                    this.props.dispatch(action);
+                                }}
+                            >
+                                Xóa
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    document.getElementById("studentId").disabled = true;
+                                    const action = {
+                                        type: "HANDLE_UPDATE_RENDER",
+                                        payload: {
+                                            student: student,
+                                            studentId: student.studentId,
+                                        },
+                                    };
+                                    this.props.dispatch(action);
+                                }}
+                            >
+                                Sửa
+                            </button>
+                        </td>
+                    </tr>
+                );
+            });
+        }
+    };
+
     render() {
-        console.log(this.props)
         return (
             <table className="table">
                 <thead className='table-dark'>
@@ -21,46 +120,16 @@ class TableStudent extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {this.props.studentArray.map((student) => {
-                        console.log(student)
-                        return (
-                            <tr key={student.id}>
-                                <td>{student.id}</td>
-                                <td>{student.studentName}</td>
-                                <td>{student.phone}</td>
-                                <td>{student.email}</td>
-                                <td>
-                                    <button
-                                        className='btn btn-primary mx-2'
-                                        onClick={() => { this.handleEditStudent(student) }}
-                                    >Sửa</button>
-                                    <button
-                                        className='btn btn-danger'
-                                        onClick={() => {
-                                            const action = {
-                                                type: 'DELETE_STUDENT',
-                                                payload: student.id,
-                                            };
-
-                                            this.props.dispatch(action);
-                                        }}
-                                    >Xóa</button>
-                                </td>
-                            </tr>
-                        )
-                    })}
-
+                    {this.renderStudentInfo()}
                 </tbody>
             </table>
         );
     }
 }
 
-const mapStateToProps = (rootReducer) => {
-    console.log(rootReducer);
-    return {
-        studentArray: rootReducer.formReducer.studentArray,
-    }
-}
-
+const mapStateToProps = (rootReducer) => ({
+    studentInfo: rootReducer.formReducer.studentList,
+    searchList: rootReducer.formReducer.searchList,
+    searchInp: rootReducer.formReducer.searchInp,
+});
 export default connect(mapStateToProps)(TableStudent);
