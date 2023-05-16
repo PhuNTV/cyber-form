@@ -13,6 +13,7 @@ class FormRegister extends Component {
             },
         };
         this.props.dispatch(action);
+
     };
 
 
@@ -38,11 +39,13 @@ class FormRegister extends Component {
             },
         };
         this.props.dispatch(action);
+        document.getElementById("studentId").disabled = false;
+        document.getElementById("update_btn").style.display = "none";
+        document.getElementById("create_btn").style.display = "block"
     };
 
     render() {
         let { err, student } = this.props;
-        const { showAddStudentButton } = this.props;
         return (
             <form onSubmit={this.createStudent}>
                 <div className='card '>
@@ -120,13 +123,16 @@ class FormRegister extends Component {
                         <div className="col-2" style={{
                             padding: '0 2rem 1rem '
                         }}>
-                            {showAddStudentButton && <button
+                            <button
+                                id='create_btn'
                                 onClick={this.createStudent}
-                                className='btn btn-success'>Thêm Sinh Viên</button>}
-                            {!showAddStudentButton && <button
+                                className='btn btn-success'>Thêm Sinh Viên</button>
+                            <button
+                                id='update_btn'
                                 className='btn btn-success'
                                 onClick={this.updateSubmit}
-                            >Cập Nhập</button>}
+                                style={{ display: 'none' }}
+                            >Cập Nhập</button>
                         </div>
                     </div>
                 </div>

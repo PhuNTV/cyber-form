@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 class TableStudent extends Component {
-
-
     renderStudentInfo = () => {
         let { studentInfo, searchList, searchInp } = this.props;
         if (!searchList.length) {
@@ -40,8 +38,9 @@ class TableStudent extends Component {
                             <button
                                 className="btn btn-primary"
                                 onClick={() => {
-                                    this.props.onEdit();
                                     document.getElementById("studentId").disabled = true;
+                                    document.getElementById("create_btn").style.display = "none";
+                                    document.getElementById("update_btn").style.display = "block";
 
                                     const action = {
                                         type: "HANDLE_UPDATE_RENDER",
@@ -51,6 +50,7 @@ class TableStudent extends Component {
                                         },
                                     };
                                     this.props.dispatch(action);
+                                    this.setState({ isUpdating: true });
                                 }}
                             >
                                 Sửa
@@ -88,6 +88,8 @@ class TableStudent extends Component {
                                 className="btn btn-primary"
                                 onClick={() => {
                                     document.getElementById("studentId").disabled = true;
+                                    document.getElementById("create_btn").style.display = "none";
+                                    document.getElementById("update_btn").style.display = "block";
                                     const action = {
                                         type: "HANDLE_UPDATE_RENDER",
                                         payload: {
